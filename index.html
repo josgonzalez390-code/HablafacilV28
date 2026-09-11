@@ -474,6 +474,78 @@
     border-color:var(--green);
     color:var(--green);
   }
+
+  .know-challenge{
+    margin-top:14px;
+    padding:18px;
+    background:#F2F7FE;
+    border:1px solid var(--paper-line);
+    border-radius:14px;
+    text-align:center;
+  }
+  .kc-title{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:16px;
+    color:var(--ink);
+    margin:0 0 4px;
+  }
+  .kc-sub{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    margin:0 0 12px;
+  }
+  .kc-input{
+    width:100%;
+    height:44px;
+    border-radius:10px;
+    border:1px solid var(--paper-line);
+    background:#fff;
+    padding:0 14px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:15px;
+    color:var(--ink);
+    box-sizing:border-box;
+  }
+  .kc-status{
+    min-height:18px;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    margin:10px 0 2px;
+  }
+  .kc-status.ok{ color:var(--green); font-weight:700; }
+  .kc-status.retry{ color:var(--red); font-weight:600; }
+  .kc-row{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:16px;
+    margin-top:12px;
+  }
+  .kc-btn-primary{
+    height:40px;
+    padding:0 24px;
+    border-radius:20px;
+    border:none;
+    background:var(--blue);
+    color:#fff;
+    font-family:'Work Sans', sans-serif;
+    font-size:13.5px;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .kc-btn-primary:active{ transform:scale(0.97); }
+  .kc-btn-link{
+    border:none;
+    background:none;
+    color:var(--ink-soft);
+    font-family:'Work Sans', sans-serif;
+    font-size:12.5px;
+    font-weight:600;
+    text-decoration:underline;
+    cursor:pointer;
+  }
+
   .tab-count{
     font-size:9.5px;
     opacity:0.65;
@@ -599,6 +671,53 @@
   .listen-hint{
     font-size:12.5px;
     color:var(--ink-soft);
+  }
+
+  .speak-panel{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:14px;
+    margin:0 0 26px;
+    text-align:center;
+  }
+  .speak-mic-btn{
+    width:84px;
+    height:84px;
+    border-radius:50%;
+    border:none;
+    background:var(--blue);
+    color:#fff;
+    font-size:34px;
+    cursor:pointer;
+    box-shadow:0 10px 24px -12px rgba(31,78,156,0.55);
+  }
+  .speak-mic-btn:active{ transform:scale(0.96); }
+  .speak-mic-btn.listening{
+    background:var(--green);
+    animation: speak-pulse 1s ease-in-out infinite;
+  }
+  @keyframes speak-pulse{
+    0%, 100%{ box-shadow:0 0 0 0 rgba(19,162,106,0.45); }
+    50%{ box-shadow:0 0 0 16px rgba(19,162,106,0); }
+  }
+  .speak-status{
+    font-size:13.5px;
+    color:var(--ink-soft);
+    max-width:280px;
+    line-height:1.5;
+  }
+  .speak-status.ok{ color:var(--green); font-weight:700; }
+  .speak-status.retry{ color:var(--red); font-weight:600; }
+  .speak-continue-btn{
+    border:none;
+    background:none;
+    color:var(--blue);
+    font-family:'Work Sans', sans-serif;
+    font-size:13px;
+    font-weight:700;
+    text-decoration:underline;
+    cursor:pointer;
   }
 
   /* Practice mode */
@@ -2293,6 +2412,29 @@ html, body, .app-shell {
       <div class="known-row">
         <button class="known-btn" id="knownBtn">✅ Ya la sé</button>
       </div>
+
+      <div class="know-challenge" id="knowChallenge" style="display:none;">
+        <div class="kc-step" id="kcStepWrite">
+          <p class="kc-title">Paso 1 de 2 · Escríbela</p>
+          <p class="kc-sub">Escribe la frase en inglés para confirmar que la sabes:</p>
+          <input type="text" id="kcWriteInput" class="kc-input" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="Escribe aquí…">
+          <p class="kc-status" id="kcWriteStatus"></p>
+          <div class="kc-row">
+            <button class="kc-btn-primary" id="kcWriteCheck">Comprobar</button>
+            <button class="kc-btn-link" id="kcWriteCancel">Cancelar</button>
+          </div>
+        </div>
+        <div class="kc-step" id="kcStepSpeak" style="display:none;">
+          <p class="kc-title">Paso 2 de 2 · Pronúnciala</p>
+          <p class="kc-sub">Ahora dila en voz alta:</p>
+          <button class="speak-mic-btn" id="kcMicBtn">🎙️</button>
+          <p class="kc-status" id="kcSpeakStatus">Toca el micrófono y repite la frase en inglés.</p>
+          <div class="kc-row">
+            <button class="kc-btn-link" id="kcSpeakContinue" style="display:none;">Continuar de todas formas →</button>
+            <button class="kc-btn-link" id="kcSpeakCancel">Cancelar</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="quiz" id="quizView">
@@ -2301,6 +2443,11 @@ html, body, .app-shell {
       <div class="listen-prompt" id="listenPrompt" style="display:none;">
         <button class="listen-icon" id="quizPlayBtn">🔊</button>
         <span class="listen-hint">Toca para escuchar de nuevo</span>
+      </div>
+      <div class="speak-panel" id="speakPanel" style="display:none;">
+        <button class="speak-mic-btn" id="speakMicBtn">🎙️</button>
+        <p class="speak-status" id="speakStatus">Toca el micrófono y repite la frase en inglés.</p>
+        <button class="speak-continue-btn" id="speakContinueBtn" style="display:none;">Continuar de todas formas →</button>
       </div>
       <div class="options" id="quizOptions"></div>
       <div class="quiz-footer">
@@ -2319,6 +2466,7 @@ html, body, .app-shell {
 
   <button class="practice-btn" id="practiceBtn">Practicar esta categoría</button>
   <button class="practice-btn-outline" id="listenModeBtn">🎧 Escucha y adivina</button>
+  <button class="practice-btn-outline" id="speakModeBtn">🎙️ Practica tu pronunciación</button>
   <button class="practice-btn-outline" id="hardModeBtn" style="display:none;">⭐ Repasar mis difíciles</button>
     </div>
 
@@ -2885,6 +3033,7 @@ html, body, .app-shell {
       if(lvl === 3){
         showToast('🏆 ¡Frase dominada!');
         launchConfetti(cardView);
+        playAchievementTone();
       } else if(lvl === 1){
         showToast('📖 En aprendizaje');
       } else if(lvl === 2){
@@ -3024,6 +3173,7 @@ html, body, .app-shell {
         const badge = BADGES.find(b => b.id === newOnes[0]);
         showToast('🏆 ¡Nuevo logro desbloqueado: ' + badge.name + '!');
         launchConfetti(document.getElementById('achievementsPanel'));
+        playAchievementTone();
       }
     }
     previousUnlockedIds = unlockedNow;
@@ -3086,6 +3236,7 @@ html, body, .app-shell {
       saveGoalsMet();
       showToast('🎉 ¡Meta diaria cumplida!');
       launchConfetti(document.getElementById('goalBox'));
+      playAchievementTone();
     }
   }
 
@@ -3146,6 +3297,34 @@ html, body, .app-shell {
     }
   }
 
+  // ---- Tono de logro (sin archivos externos, generado con Web Audio) ----
+  let achievementAudioCtx = null;
+  function playAchievementTone(){
+    try{
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if(!Ctx) return;
+      if(!achievementAudioCtx) achievementAudioCtx = new Ctx();
+      if(achievementAudioCtx.state === 'suspended') achievementAudioCtx.resume();
+      const ctx = achievementAudioCtx;
+      const notes = [523.25, 659.25, 783.99]; // Do-Mi-Sol: acorde mayor, alegre
+      const startAt = ctx.currentTime + 0.02;
+      notes.forEach((freq, i)=>{
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        const t0 = startAt + i*0.07;
+        gain.gain.setValueAtTime(0, t0);
+        gain.gain.linearRampToValueAtTime(0.16, t0 + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.45);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(t0);
+        osc.stop(t0 + 0.5);
+      });
+    }catch(e){}
+  }
+
   let currentCat = "saludos";
   let currentIdx = 0;
   let revealed = false;
@@ -3169,6 +3348,7 @@ html, body, .app-shell {
   const nextBtn = document.getElementById('nextBtn');
   const practiceBtn = document.getElementById('practiceBtn');
   const listenModeBtn = document.getElementById('listenModeBtn');
+  const speakModeBtn = document.getElementById('speakModeBtn');
   const hardModeBtn = document.getElementById('hardModeBtn');
   const cardView = document.getElementById('cardView');
   const quizView = document.getElementById('quizView');
@@ -3177,6 +3357,10 @@ html, body, .app-shell {
   const quizPhraseEl = document.getElementById('quizPhrase');
   const listenPrompt = document.getElementById('listenPrompt');
   const quizPlayBtn = document.getElementById('quizPlayBtn');
+  const speakPanel = document.getElementById('speakPanel');
+  const speakMicBtn = document.getElementById('speakMicBtn');
+  const speakStatusEl = document.getElementById('speakStatus');
+  const speakContinueBtn = document.getElementById('speakContinueBtn');
   const quizOptionsEl = document.getElementById('quizOptions');
   const quizScoreEl = document.getElementById('quizScore');
   const exitQuizBtn = document.getElementById('exitQuizBtn');
@@ -3211,6 +3395,8 @@ html, body, .app-shell {
     buildTabs();
     const list = DATA[currentCat].phrases;
     const item = list[currentIdx];
+
+    closeKnowChallenge();
 
     enPhraseEl.textContent = item.en;
     pronEl.textContent = item.pron;
@@ -3299,10 +3485,196 @@ html, body, .app-shell {
     if(revealed) advanceLevel(currentCat, currentIdx, 1);
     render();
   };
-  document.getElementById('knownBtn').onclick = ()=>{
-    advanceLevel(currentCat, currentIdx, 3);
+  // ---- Reto "Ya la sé": escribir + pronunciar antes de marcar como dominada ----
+  const knowChallenge = document.getElementById('knowChallenge');
+  const kcStepWrite = document.getElementById('kcStepWrite');
+  const kcStepSpeak = document.getElementById('kcStepSpeak');
+  const kcWriteInput = document.getElementById('kcWriteInput');
+  const kcWriteStatus = document.getElementById('kcWriteStatus');
+  const kcWriteCheck = document.getElementById('kcWriteCheck');
+  const kcWriteCancel = document.getElementById('kcWriteCancel');
+  const kcMicBtn = document.getElementById('kcMicBtn');
+  const kcSpeakStatus = document.getElementById('kcSpeakStatus');
+  const kcSpeakContinue = document.getElementById('kcSpeakContinue');
+  const kcSpeakCancel = document.getElementById('kcSpeakCancel');
+  const KC_MAX_ATTEMPTS = 2;
+
+  let kcItem = null;
+  let kcCat = null;
+  let kcIdx = null;
+  let kcWriteAttempts = 0;
+  let kcSpeakAttempts = 0;
+  let kcRecognizer = null;
+
+  function levenshtein(a, b){
+    const m = a.length, n = b.length;
+    const d = Array.from({length:m+1}, (_,i)=>[i, ...Array(n).fill(0)]);
+    for(let j=0;j<=n;j++) d[0][j] = j;
+    for(let i=1;i<=m;i++){
+      for(let j=1;j<=n;j++){
+        d[i][j] = a[i-1] === b[j-1]
+          ? d[i-1][j-1]
+          : 1 + Math.min(d[i-1][j], d[i][j-1], d[i-1][j-1]);
+      }
+    }
+    return d[m][n];
+  }
+
+  function textMatches(input, target){
+    const a = normalizeSpeech(input);
+    const b = normalizeSpeech(target);
+    if(!a) return false;
+    if(a === b) return true;
+    const dist = levenshtein(a, b);
+    return dist <= Math.max(1, Math.round(b.length * 0.25));
+  }
+
+  function stopKcRecognition(){
+    if(kcRecognizer){
+      try{ kcRecognizer.abort(); }catch(e){}
+    }
+    if(kcMicBtn) kcMicBtn.classList.remove('listening');
+  }
+
+  function closeKnowChallenge(){
+    stopKcRecognition();
+    knowChallenge.style.display = 'none';
+    kcStepWrite.style.display = 'block';
+    kcStepSpeak.style.display = 'none';
+    kcWriteInput.value = '';
+    kcWriteStatus.textContent = '';
+    kcWriteStatus.className = 'kc-status';
+    kcSpeakStatus.textContent = 'Toca el micrófono y repite la frase en inglés.';
+    kcSpeakStatus.className = 'kc-status';
+    kcSpeakContinue.style.display = 'none';
+    kcItem = null;
+  }
+
+  function openKnowChallenge(){
+    const level = levelOf(currentCat, currentIdx);
+    if(level >= 3){
+      showToast('🏆 Ya dominas esta frase.');
+      return;
+    }
+    kcItem = DATA[currentCat].phrases[currentIdx];
+    kcCat = currentCat;
+    kcIdx = currentIdx;
+    kcWriteAttempts = 0;
+    kcSpeakAttempts = 0;
+    knowChallenge.style.display = 'block';
+    kcStepWrite.style.display = 'block';
+    kcStepSpeak.style.display = 'none';
+    kcWriteInput.value = '';
+    kcWriteStatus.textContent = '';
+    kcWriteStatus.className = 'kc-status';
+    kcWriteInput.focus();
+    knowChallenge.scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
+
+  function goToSpeakStep(){
+    kcStepWrite.style.display = 'none';
+    kcStepSpeak.style.display = 'block';
+    kcSpeakAttempts = 0;
+    kcSpeakStatus.textContent = 'Toca el micrófono y repite la frase en inglés.';
+    kcSpeakStatus.className = 'kc-status';
+    kcSpeakContinue.style.display = 'none';
+  }
+
+  function finishKnowChallenge(){
+    if(kcCat === null || kcIdx === null) return;
+    advanceLevel(kcCat, kcIdx, 3);
+    closeKnowChallenge();
     render();
+  }
+
+  kcWriteCheck.onclick = ()=>{
+    if(!kcItem) return;
+    if(textMatches(kcWriteInput.value, kcItem.en)){
+      kcWriteStatus.textContent = '✅ ¡Bien escrita!';
+      kcWriteStatus.className = 'kc-status ok';
+      setTimeout(goToSpeakStep, 500);
+    }else{
+      kcWriteAttempts++;
+      if(kcWriteAttempts >= KC_MAX_ATTEMPTS){
+        kcWriteStatus.innerHTML = 'No coincide del todo. <span id="kcWriteSkip" style="text-decoration:underline;cursor:pointer;">Saltar este paso →</span>';
+        kcWriteStatus.className = 'kc-status retry';
+        const skip = document.getElementById('kcWriteSkip');
+        if(skip) skip.onclick = goToSpeakStep;
+      }else{
+        kcWriteStatus.textContent = 'No coincide, revisa e intenta de nuevo.';
+        kcWriteStatus.className = 'kc-status retry';
+      }
+    }
   };
+  kcWriteInput.addEventListener('keydown', e=>{
+    if(e.key === 'Enter') kcWriteCheck.click();
+  });
+  kcWriteCancel.onclick = closeKnowChallenge;
+  kcSpeakCancel.onclick = closeKnowChallenge;
+
+  kcMicBtn.onclick = ()=>{
+    if(!SpeechRec){
+      kcSpeakStatus.textContent = 'Tu navegador no tiene reconocimiento de voz disponible.';
+      kcSpeakContinue.style.display = 'inline-block';
+      return;
+    }
+    if(!kcItem) return;
+    stopKcRecognition();
+    kcRecognizer = new SpeechRec();
+    kcRecognizer.lang = 'en-US';
+    kcRecognizer.interimResults = false;
+    kcRecognizer.maxAlternatives = 1;
+
+    kcMicBtn.classList.add('listening');
+    kcSpeakStatus.className = 'kc-status';
+    kcSpeakStatus.textContent = '🎙️ Escuchando… di la frase en inglés.';
+
+    kcRecognizer.onresult = (event)=>{
+      const said = event.results[0][0].transcript;
+      kcMicBtn.classList.remove('listening');
+      if(speechMatches(said, kcItem.en)){
+        kcSpeakStatus.textContent = '✅ ¡Muy bien! Buena pronunciación.';
+        kcSpeakStatus.className = 'kc-status ok';
+        setTimeout(finishKnowChallenge, 700);
+      }else{
+        kcSpeakAttempts++;
+        if(kcSpeakAttempts >= KC_MAX_ATTEMPTS){
+          kcSpeakStatus.textContent = 'Escuché: "' + said + '". Sigue practicando, no te preocupes.';
+          kcSpeakStatus.className = 'kc-status retry';
+          kcSpeakContinue.style.display = 'inline-block';
+        }else{
+          kcSpeakStatus.textContent = 'Escuché: "' + said + '". Intenta una vez más.';
+          kcSpeakStatus.className = 'kc-status retry';
+        }
+      }
+    };
+    kcRecognizer.onerror = (event)=>{
+      kcMicBtn.classList.remove('listening');
+      kcSpeakAttempts++;
+      if(event.error === 'not-allowed' || event.error === 'service-not-allowed'){
+        kcSpeakStatus.textContent = 'No pudimos usar el micrófono (permiso denegado). Puedes continuar sin problema.';
+        kcSpeakStatus.className = 'kc-status retry';
+        kcSpeakContinue.style.display = 'inline-block';
+      }else if(kcSpeakAttempts >= KC_MAX_ATTEMPTS){
+        kcSpeakStatus.textContent = 'No pudimos escucharte bien. Puedes continuar de todas formas.';
+        kcSpeakStatus.className = 'kc-status retry';
+        kcSpeakContinue.style.display = 'inline-block';
+      }else{
+        kcSpeakStatus.textContent = 'No te escuchamos bien, intenta de nuevo.';
+        kcSpeakStatus.className = 'kc-status retry';
+      }
+    };
+    kcRecognizer.onend = ()=>{ kcMicBtn.classList.remove('listening'); };
+    try{
+      kcRecognizer.start();
+    }catch(e){
+      kcSpeakStatus.textContent = 'No se pudo activar el micrófono. Puedes continuar sin problema.';
+      kcSpeakContinue.style.display = 'inline-block';
+    }
+  };
+  kcSpeakContinue.onclick = finishKnowChallenge;
+
+  document.getElementById('knownBtn').onclick = openKnowChallenge;
   starBtn.onclick = ()=>{
     toggleDifficult(currentCat, currentIdx);
     render();
@@ -3354,7 +3726,7 @@ html, body, .app-shell {
     const base = quizMode === 'hard'
       ? DATA[currentCat].phrases.filter((p,i)=> isDifficult(currentCat, i))
       : DATA[currentCat].phrases;
-    quizList = quizMode === 'listen' ? shuffle(base) : buildSmartList(base);
+    quizList = (quizMode === 'listen' || quizMode === 'speak') ? shuffle(base) : buildSmartList(base);
     quizIdx = 0;
     quizScore = 0;
     cardView.style.display = 'none';
@@ -3362,20 +3734,25 @@ html, body, .app-shell {
     progressRow.style.display = 'none';
     practiceBtn.style.display = 'none';
     listenModeBtn.style.display = 'none';
+    speakModeBtn.style.display = 'none';
     hardModeBtn.style.display = 'none';
-    quizQuestionLabel.textContent = quizMode === 'listen' ? 'Escucha y elige la traducción' : '¿Cómo se dice…?';
+    quizQuestionLabel.textContent = quizMode === 'listen'
+      ? 'Escucha y elige la traducción'
+      : (quizMode === 'speak' ? 'Repite la frase en voz alta' : '¿Cómo se dice…?');
     quizView.classList.add('active');
     renderQuiz();
   }
 
   function exitQuiz(){
     inQuiz = false;
+    stopSpeakRecognition();
     quizView.classList.remove('active');
     cardView.style.display = 'flex';
     cardNavRow.style.display = 'flex';
     progressRow.style.display = 'flex';
     practiceBtn.style.display = 'block';
     listenModeBtn.style.display = 'block';
+    speakModeBtn.style.display = 'block';
     render();
   }
 
@@ -3383,6 +3760,9 @@ html, body, .app-shell {
     if(quizIdx >= quizList.length){
       quizPhraseEl.style.display = 'block';
       listenPrompt.style.display = 'none';
+      speakPanel.style.display = 'none';
+      stopSpeakRecognition();
+      quizOptionsEl.style.display = '';
       quizPhraseEl.textContent = quizList.length ? '¡Categoría completa!' : 'No tienes frases marcadas como difíciles todavía.';
       quizOptionsEl.innerHTML = '';
       if(quizList.length){
@@ -3402,6 +3782,19 @@ html, body, .app-shell {
     }
     quizAnswered = false;
     const item = quizList[quizIdx];
+
+    if(quizMode === 'speak'){
+      quizPhraseEl.style.display = 'block';
+      listenPrompt.style.display = 'none';
+      quizOptionsEl.style.display = 'none';
+      speakPanel.style.display = 'flex';
+      quizPhraseEl.textContent = item.en;
+      startSpeakAttempt(item);
+      quizScoreEl.textContent = quizScore + ' / ' + quizIdx;
+      return;
+    }
+    quizOptionsEl.style.display = '';
+    speakPanel.style.display = 'none';
 
     if(quizMode === 'listen'){
       quizPhraseEl.style.display = 'none';
@@ -3458,8 +3851,137 @@ html, body, .app-shell {
     if(quizIdx < quizList.length) speak(quizList[quizIdx].en);
   };
 
+  // ---- Práctica de pronunciación (reconocimiento de voz, no estricto) ----
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let speakRecognizer = null;
+  let speakAttempts = 0;
+  let speakCurrentItem = null;
+  const SPEAK_MAX_ATTEMPTS = 2;
+
+  function normalizeSpeech(s){
+    return (s || '').toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+      .replace(/[^a-z0-9\s]/g,'')
+      .trim();
+  }
+
+  function speechMatches(said, target){
+    const saidWords = normalizeSpeech(said).split(/\s+/).filter(Boolean);
+    const targetWords = normalizeSpeech(target).split(/\s+/).filter(Boolean);
+    if(!targetWords.length) return false;
+    const saidSet = new Set(saidWords);
+    let hits = 0;
+    targetWords.forEach(w => { if(saidSet.has(w)) hits++; });
+    return (hits / targetWords.length) >= 0.6;
+  }
+
+  function stopSpeakRecognition(){
+    if(speakRecognizer){
+      try{ speakRecognizer.abort(); }catch(e){}
+    }
+    if(speakMicBtn) speakMicBtn.classList.remove('listening');
+  }
+
+  function speakPass(item){
+    speakStatusEl.textContent = '✅ ¡Muy bien! Buena pronunciación.';
+    speakStatusEl.className = 'speak-status ok';
+    speakContinueBtn.style.display = 'none';
+    const idx = DATA[currentCat].phrases.indexOf(item);
+    advanceLevel(currentCat, idx, levelOf(currentCat, idx) + 1);
+    quizScore++;
+    renderStats();
+    renderGoal();
+    renderBadges();
+    quizScoreEl.textContent = quizScore + ' / ' + (quizIdx+1);
+    setTimeout(()=>{
+      quizIdx++;
+      renderQuiz();
+    }, 900);
+  }
+
+  function startSpeakAttempt(item){
+    speakCurrentItem = item;
+    speakAttempts = 0;
+    speakContinueBtn.style.display = 'none';
+    speakStatusEl.className = 'speak-status';
+    if(!SpeechRec){
+      speakStatusEl.textContent = 'Tu navegador no tiene reconocimiento de voz disponible.';
+      speakContinueBtn.style.display = 'inline-block';
+      return;
+    }
+    speakStatusEl.textContent = 'Toca el micrófono y repite la frase en inglés.';
+  }
+
+  function runSpeakRecognition(){
+    if(!SpeechRec){
+      speakContinueBtn.style.display = 'inline-block';
+      return;
+    }
+    stopSpeakRecognition();
+    speakRecognizer = new SpeechRec();
+    speakRecognizer.lang = 'en-US';
+    speakRecognizer.interimResults = false;
+    speakRecognizer.maxAlternatives = 1;
+
+    speakMicBtn.classList.add('listening');
+    speakStatusEl.className = 'speak-status';
+    speakStatusEl.textContent = '🎙️ Escuchando… di la frase en inglés.';
+
+    speakRecognizer.onresult = (event)=>{
+      const said = event.results[0][0].transcript;
+      speakMicBtn.classList.remove('listening');
+      if(speechMatches(said, speakCurrentItem.en)){
+        speakPass(speakCurrentItem);
+      }else{
+        speakAttempts++;
+        if(speakAttempts >= SPEAK_MAX_ATTEMPTS){
+          speakStatusEl.textContent = 'Escuché: "' + said + '". Sigue practicando, no te preocupes.';
+          speakStatusEl.className = 'speak-status retry';
+          speakContinueBtn.style.display = 'inline-block';
+        }else{
+          speakStatusEl.textContent = 'Escuché: "' + said + '". Intenta una vez más.';
+          speakStatusEl.className = 'speak-status retry';
+        }
+      }
+    };
+
+    speakRecognizer.onerror = (event)=>{
+      speakMicBtn.classList.remove('listening');
+      speakAttempts++;
+      if(event.error === 'not-allowed' || event.error === 'service-not-allowed'){
+        speakStatusEl.textContent = 'No pudimos usar el micrófono (permiso denegado). Puedes continuar sin problema.';
+        speakStatusEl.className = 'speak-status retry';
+        speakContinueBtn.style.display = 'inline-block';
+      }else if(speakAttempts >= SPEAK_MAX_ATTEMPTS){
+        speakStatusEl.textContent = 'No pudimos escucharte bien. Puedes continuar de todas formas.';
+        speakStatusEl.className = 'speak-status retry';
+        speakContinueBtn.style.display = 'inline-block';
+      }else{
+        speakStatusEl.textContent = 'No te escuchamos bien, intenta de nuevo.';
+        speakStatusEl.className = 'speak-status retry';
+      }
+    };
+
+    speakRecognizer.onend = ()=>{
+      speakMicBtn.classList.remove('listening');
+    };
+
+    try{
+      speakRecognizer.start();
+    }catch(e){
+      speakStatusEl.textContent = 'No se pudo activar el micrófono. Puedes continuar sin problema.';
+      speakContinueBtn.style.display = 'inline-block';
+    }
+  }
+
+  speakMicBtn.onclick = runSpeakRecognition;
+  speakContinueBtn.onclick = ()=>{
+    if(speakCurrentItem) speakPass(speakCurrentItem);
+  };
+
   practiceBtn.onclick = ()=> startQuiz('normal');
   listenModeBtn.onclick = ()=> startQuiz('listen');
+  speakModeBtn.onclick = ()=> startQuiz('speak');
   hardModeBtn.onclick = ()=> startQuiz('hard');
   exitQuizBtn.onclick = exitQuiz;
 
