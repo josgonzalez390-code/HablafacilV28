@@ -1,4 +1,4 @@
-const CACHE_NAME = "habla-facil-v5";
+const CACHE_NAME = "habla-facil-v7";
 const ASSETS = [
   "./index.html",
   "./manifest.json",

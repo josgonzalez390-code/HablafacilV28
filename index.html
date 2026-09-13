@@ -604,15 +604,21 @@
     padding:16px 22px 20px;
   }
   .nav-btn{
-    border:none;
+    border:2px solid #000;
     background:none;
-    color:var(--ink-soft);
+    color:var(--green);
     font-size:14px;
-    font-weight:600;
+    font-weight:700;
     cursor:pointer;
-    padding:8px 4px;
+    padding:8px 14px;
+    border-radius:20px;
   }
   .nav-btn:disabled{ opacity:0.3; }
+  .nav-btn-next{
+    color:var(--green);
+    font-weight:700;
+  }
+  .nav-btn-next:disabled{ color:var(--ink-soft); opacity:0.3; }
   .counter{
     font-family:'IBM Plex Mono', monospace;
     font-size:12.5px;
@@ -2112,44 +2118,49 @@ html, body, .app-shell {
   display:flex; align-items:center; justify-content:center;
   padding:24px; box-sizing:border-box;
   background:
-    radial-gradient(circle at 20% 10%,rgba(39,120,255,.24),transparent 35%),
-    radial-gradient(circle at 85% 80%,rgba(111,43,255,.22),transparent 38%),
+    radial-gradient(circle at 20% 10%,rgba(31,78,156,.30),transparent 35%),
+    radial-gradient(circle at 85% 80%,rgba(19,162,106,.24),transparent 38%),
     #031329;
   color:#fff; font-family:system-ui,-apple-system,Segoe UI,sans-serif;
 }
 #hf26Gate.hidden{display:none}
 .hf26-box{
   width:min(430px,100%); padding:30px 24px 24px;
-  border:1px solid rgba(91,180,255,.28); border-radius:28px;
+  border:1px solid rgba(79,140,220,.30); border-radius:28px;
   background:linear-gradient(145deg,rgba(11,43,83,.97),rgba(5,22,47,.98));
   box-shadow:0 24px 70px rgba(0,0,0,.48);
   text-align:center;
 }
 .hf26-brand{font-size:28px;font-weight:900;letter-spacing:2px}
-.hf26-brand span{color:#22c8ff}
-.hf26-lock{font-size:48px;margin:10px 0 4px}
+.hf26-brand span{color:#4FD1A0}
+.hf26-lock{
+  font-size:24px;margin:10px auto 4px;
+  width:56px;height:56px;border-radius:50%;
+  background:rgba(31,78,156,.35);border:1px solid #3A6FCE;
+  display:flex;align-items:center;justify-content:center;
+}
 .hf26-title{font-size:25px;font-weight:800;margin:4px 0 8px}
-.hf26-sub{color:#a9c2dd;font-size:15px;line-height:1.5;margin:0 auto 22px}
+.hf26-sub{color:#9FB4D6;font-size:15px;line-height:1.5;margin:0 auto 22px}
 .hf26-input{
   width:100%;box-sizing:border-box;padding:16px 17px;
-  border-radius:15px;border:1px solid rgba(128,190,255,.3);
+  border-radius:15px;border:1px solid rgba(79,140,220,.32);
   background:#071d39;color:#fff;font-size:17px;outline:none;
   text-align:center;letter-spacing:1.2px;text-transform:uppercase;
 }
-.hf26-input:focus{border-color:#28b9ff;box-shadow:0 0 0 3px rgba(40,185,255,.12)}
+.hf26-input:focus{border-color:#4C8FE0;box-shadow:0 0 0 3px rgba(76,143,224,.14)}
 .hf26-btn{
   width:100%;margin-top:12px;padding:16px;border:0;border-radius:15px;
-  background:linear-gradient(90deg,#087cff,#6330ff);color:#fff;
+  background:#13A26A;color:#fff;
   font-size:17px;font-weight:800;cursor:pointer;
 }
 .hf26-register{
   margin-top:17px;padding:13px;border-radius:14px;
-  background:rgba(255,255,255,.045);color:#a9d8ff;font-size:14px;
+  background:rgba(255,255,255,.045);color:#9FB4D6;font-size:14px;
 }
 .hf26-register b{color:#fff}
 #hf26Msg{min-height:21px;margin:12px 0 0;font-size:14px}
 .hf26-demo{margin-top:18px;color:#708ca9;font-size:12px;line-height:1.5}
-.hf26-demo code{color:#b8d8ff}
+.hf26-demo code{color:#9FB4D6}
 #hf26UserPanel{display:none;margin-top:14px;text-align:left}
 #hf26UserPanel input{margin-top:8px}
 </style>
@@ -2460,7 +2471,7 @@ html, body, .app-shell {
     <div class="nav-row" id="cardNavRow">
       <button class="nav-btn" id="prevBtn">← Anterior</button>
       <span class="counter" id="counter">1 / 10</span>
-      <button class="nav-btn" id="nextBtn">Siguiente →</button>
+      <button class="nav-btn nav-btn-next" id="nextBtn">Siguiente →</button>
     </div>
   </div>
 
@@ -3685,7 +3696,7 @@ html, body, .app-shell {
   };
   document.getElementById('slowBtn').onclick = ()=>{
     const item = DATA[currentCat].phrases[currentIdx];
-    speak(item.en, 0.6);
+    speak(item.en, 0.4);
   };
   prevBtn.onclick = ()=>{
     if(currentIdx>0){ currentIdx--; revealed=false; render(); }
