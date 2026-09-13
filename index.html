@@ -3469,12 +3469,14 @@ html, body, .app-shell {
       || null;
   }
 
+  let activeUtterance = null;
   function speak(text, rate){
     if(!('speechSynthesis' in window)){
       alert('Este navegador no soporta audio de voz. Prueba abriendo la app en Chrome o Safari actualizados.');
       return;
     }
     try{
+      window.speechSynthesis.resume();
       window.speechSynthesis.cancel();
       const u = new SpeechSynthesisUtterance(text);
       const v = pickEnglishVoice();
@@ -3485,7 +3487,18 @@ html, body, .app-shell {
       u.onerror = function(){
         console.error('Error de síntesis de voz');
       };
-      window.speechSynthesis.speak(u);
+      u.onend = function(){
+        activeUtterance = null;
+      };
+      // Se guarda en una variable fuera de la función: en Chrome para Android,
+      // si no queda ninguna referencia activa, el objeto puede borrarse de
+      // memoria antes de terminar de hablar y el audio se queda mudo.
+      activeUtterance = u;
+      // Pequeña espera: en Chrome para Android, cancel() y speak() llamados
+      // en el mismo instante a veces hacen que el audio no arranque.
+      setTimeout(()=>{
+        window.speechSynthesis.speak(u);
+      }, 50);
     }catch(e){
       console.error(e);
     }
