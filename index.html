@@ -1951,10 +1951,48 @@ html, body, .app-shell {
   border-color:rgba(255,255,255,.08) !important;
 }
 #screen-practicar .icon-btn{
-  background:#102F55 !important;
-  border-color:rgba(113,191,231,.24) !important;
+  background:#1E4A85 !important;
+  border:1px solid rgba(143,197,255,.55) !important;
+  color:#fff !important;
+  box-shadow:0 2px 8px rgba(0,0,0,.25) !important;
+}
+#screen-practicar .icon-btn.star-active{
+  background:#4A3B12 !important;
+  border-color:#E8B93B !important;
+}
+#screen-practicar .practice-btn-outline{
+  border:1px solid rgba(143,197,255,.6) !important;
+  color:#EAF3FF !important;
+  background:rgba(30,74,133,.35) !important;
+}
+#screen-practicar .quiz-phrase{ color:#fff !important; }
+#screen-practicar .quiz-question{ color:#9FB4D6 !important; }
+#screen-practicar .speak-status{ color:#C7D8ED !important; }
+#screen-practicar .speak-status.ok{ color:#4FD1A0 !important; }
+#screen-practicar .speak-status.retry{ color:#FF8F9F !important; }
+#screen-practicar .listen-hint{ color:#9FB4D6 !important; }
+#screen-practicar .score{ color:#9FB4D6 !important; }
+#screen-practicar .counter{ color:#9FB4D6 !important; }
+#screen-practicar .link-btn{ color:#8FC5FF !important; }
+#screen-practicar .kc-title{ color:#fff !important; }
+#screen-practicar .kc-sub{ color:#9FB4D6 !important; }
+#screen-practicar .kc-status{ color:#C7D8ED !important; }
+#screen-practicar .kc-status.ok{ color:#4FD1A0 !important; }
+#screen-practicar .kc-status.retry{ color:#FF8F9F !important; }
+#screen-practicar .kc-btn-link{ color:#8FC5FF !important; }
+#screen-practicar .know-challenge{
+  background:rgba(30,74,133,.25) !important;
+  border-color:rgba(143,197,255,.3) !important;
+}
+#screen-practicar .kc-input{
+  background:#0E2B4F !important;
+  border-color:rgba(143,197,255,.4) !important;
   color:#fff !important;
 }
+#screen-practicar .speak-continue-btn{ color:#8FC5FF !important; }
+#screen-practicar .dot{ background:rgba(159,180,214,.35) !important; }
+#screen-practicar .dot.current{ background:#8FC5FF !important; }
+#screen-practicar .dot.done{ background:#4FD1A0 !important; }
 #screen-practicar .reveal-btn{
   background:#0E2B4F !important;
   border-color:#7BA9D0 !important;
@@ -3560,7 +3598,8 @@ html, body, .app-shell {
     if(kcMicBtn) kcMicBtn.classList.remove('listening');
   }
 
-  function closeKnowChallenge(){
+  function closeKnowChallenge(fromPop){
+    const wasOpen = knowChallenge.style.display === 'block';
     stopKcRecognition();
     knowChallenge.style.display = 'none';
     kcStepWrite.style.display = 'block';
@@ -3572,6 +3611,7 @@ html, body, .app-shell {
     kcSpeakStatus.className = 'kc-status';
     kcSpeakContinue.style.display = 'none';
     kcItem = null;
+    if(wasOpen && !fromPop) consumeBackGuard();
   }
 
   function openKnowChallenge(){
@@ -3593,6 +3633,7 @@ html, body, .app-shell {
     kcWriteStatus.className = 'kc-status';
     kcWriteInput.focus();
     knowChallenge.scrollIntoView({behavior:'smooth', block:'nearest'});
+    pushBackGuard();
   }
 
   function goToSpeakStep(){
@@ -3745,6 +3786,7 @@ html, body, .app-shell {
   }
 
   function startQuiz(mode){
+    const alreadyInQuiz = inQuiz;
     inQuiz = true;
     quizMode = mode || 'normal';
     const base = quizMode === 'hard'
@@ -3765,9 +3807,11 @@ html, body, .app-shell {
       : (quizMode === 'speak' ? 'Repite la frase en voz alta' : '¿Cómo se dice…?');
     quizView.classList.add('active');
     renderQuiz();
+    if(!alreadyInQuiz) pushBackGuard();
   }
 
-  function exitQuiz(){
+  function exitQuiz(fromPop){
+    const wasInQuiz = inQuiz;
     inQuiz = false;
     stopSpeakRecognition();
     quizView.classList.remove('active');
@@ -3778,6 +3822,7 @@ html, body, .app-shell {
     listenModeBtn.style.display = 'block';
     speakModeBtn.style.display = 'block';
     render();
+    if(wasInQuiz && !fromPop) consumeBackGuard();
   }
 
   function renderQuiz(){
@@ -3821,7 +3866,8 @@ html, body, .app-shell {
     speakPanel.style.display = 'none';
 
     if(quizMode === 'listen'){
-      quizPhraseEl.style.display = 'none';
+      quizPhraseEl.style.display = 'block';
+      quizPhraseEl.textContent = item.en;
       listenPrompt.style.display = 'flex';
       speak(item.en);
     } else {
@@ -4367,6 +4413,33 @@ html, body, .app-shell {
     if(typeof action === 'function') action();
   };
 
+  // ---- Botón/gesto de "atrás" del celular ----
+  let backGuardCount = 0;
+  let suppressPopHandling = false;
+
+  function pushBackGuard(){
+    backGuardCount++;
+    try{ history.pushState({hfGuard: backGuardCount}, ''); }catch(e){}
+  }
+  function consumeBackGuard(){
+    if(backGuardCount > 0){
+      backGuardCount--;
+      suppressPopHandling = true;
+      try{ history.back(); }catch(e){}
+    }
+  }
+  window.addEventListener('popstate', function(){
+    if(suppressPopHandling){ suppressPopHandling = false; return; }
+    if(backGuardCount > 0) backGuardCount--;
+    if(knowChallenge.style.display === 'block'){
+      closeKnowChallenge(true);
+    } else if(inQuiz){
+      exitQuiz(true);
+    } else if(activeScreen !== 'home'){
+      showScreen('home');
+    }
+  });
+
   // ---- Navegación entre pantallas ----
   const screens = {
     home: document.getElementById('screen-home'),
@@ -4392,27 +4465,38 @@ html, body, .app-shell {
     window.scrollTo(0, 0);
   }
 
+  function navigateTo(name){
+    if(name !== activeScreen){
+      if(activeScreen === 'home' && name !== 'home'){
+        pushBackGuard();
+      } else if(activeScreen !== 'home' && name === 'home'){
+        consumeBackGuard();
+      }
+    }
+    showScreen(name);
+  }
+
   navButtons.forEach(btn=>{
-    btn.onclick = ()=> showScreen(btn.dataset.screen);
+    btn.onclick = ()=> navigateTo(btn.dataset.screen);
   });
 
   showScreen(activeScreen || 'home');
 
-  document.getElementById('missionCtaBtn').onclick = ()=> showScreen('practicar');
+  document.getElementById('missionCtaBtn').onclick = ()=> navigateTo('practicar');
   document.getElementById('quickLearn').onclick = ()=>{
     exitQuiz();
-    showScreen('practicar');
+    navigateTo('practicar');
   };
   document.getElementById('quickListen').onclick = ()=>{
-    showScreen('practicar');
+    navigateTo('practicar');
     startQuiz('listen');
   };
   document.getElementById('quickReview').onclick = ()=>{
-    showScreen('practicar');
+    navigateTo('practicar');
     startQuiz('normal');
   };
   document.getElementById('quickHard').onclick = ()=>{
-    showScreen('practicar');
+    navigateTo('practicar');
     startQuiz('hard');
   };
 
